@@ -26,13 +26,28 @@ public:
     ParamNode()
         : Node("param_node")
     {
-        // TODO: Declare parameters here
+        // Declare parameters with default values
+        this->declare_parameter("robot_name", "ROS2Bot");
+        this->declare_parameter("max_speed", 1.5);
+        this->declare_parameter("enabled", true);
 
-        // TODO: Create timer here
+        // Create a timer that triggers every 2000ms
+        timer_ = this->create_wall_timer(
+            2000ms, std::bind(&ParamNode::timer_callback, this));
     }
 
 private:
-    // TODO: Define timer_callback function here
+    void timer_callback()
+    {
+        // Read parameters
+        std::string robot_name = this->get_parameter("robot_name").as_string();
+        double max_speed = this->get_parameter("max_speed").as_double();
+        bool enabled = this->get_parameter("enabled").as_bool();
+
+        // Log the values
+        RCLCPP_INFO(this->get_logger(), "Robot: %s, Max Speed: %.1f, Enabled: %s",
+                    robot_name.c_str(), max_speed, enabled ? "true" : "false");
+    }
 
     rclcpp::TimerBase::SharedPtr timer_;
 };
